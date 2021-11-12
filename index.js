@@ -27,6 +27,7 @@ async function run() {
     const orderCollection = database.collection("order");
     const blogsCollection = database.collection("blogs");
     const reviewCollection = database.collection("review");
+    const usersCollection = database.collection("users");
 
     //get blogs article
     app.get("/blogs", async (req, res) => {
@@ -64,7 +65,7 @@ async function run() {
     });
 
     //GET BY EMAIL ID
-    app.get('/myorders/:email', async (req, res) => {
+    app.get("/myorders/:email", async (req, res) => {
       console.log(req.params.email);
       const email = req.params.email;
       const query = { email: email };
@@ -72,15 +73,14 @@ async function run() {
       const result = await cursor.toArray();
       // console.log(appointments);
       res.json(result);
-  })
-
+    });
 
     //add new order
     app.post("/orders", async (req, res) => {
       const newOrder = req.body;
       const result = await orderCollection.insertOne(newOrder);
 
-      console.log(`A document was inserted with the _id: ${result.insertedId}`);
+      // console.log(`A document was inserted with the _id: ${result.insertedId}`);
       res.json(result);
     });
 
@@ -95,9 +95,55 @@ async function run() {
       const newreview = req.body;
       const result = await reviewCollection.insertOne(newreview);
 
-      console.log(`A document was inserted with the _id: ${result.insertedId}`);
+      // console.log(`A document was inserted with the _id: ${result.insertedId}`);
       res.json(result);
     });
+
+    //USER ADD TO DB using register
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      // console.log(user);
+      const result = await usersCollection.insertOne(user);
+      // console.log(result);
+      res.json(result);
+    });
+
+    //user add to db using googlelogin
+    app.put("/users", async (req, res) => {
+      const user = req.body;
+      const filter = { email: user.email };
+      const options = { upsert: true };
+      const updateDoc = { $set: user };
+      const result = await usersCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.json(result);
+    });
+
+    app.put("/users/admin", async (req, res) => {
+      const user = req.body;
+      // console.log(user.email);
+      const filter = { email: user.email };
+      const updateDoc = { $set: { role: "admin" } };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.json(result);
+    });
+
+    //cheack email is admin or not
+    app.get('/isadmin/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      let isAdmin = false;
+      if (user?.role === 'admin') {
+          isAdmin = true;
+      }
+      res.json({ admin: isAdmin });
+  })
+
+
 
   } finally {
     //   await client.close();
