@@ -1,0 +1,115 @@
+const express = require("express");
+const app = express();
+var cors = require("cors");
+require("dotenv").config();
+const { MongoClient } = require("mongodb");
+const port = process.env.PORT || 5000;
+const ObjectId = require("mongodb").ObjectId;
+
+//middleware
+app.use(cors());
+app.use(express.json());
+
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.3zctf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+// console.log(uri)
+
+async function run() {
+  try {
+    await client.connect();
+    //   console.log(`done`)
+    const database = client.db("jewelry_shop");
+
+    const shopCollection = database.collection("shop");
+    const orderCollection = database.collection("order");
+    const blogsCollection = database.collection("blogs");
+    const reviewCollection = database.collection("review");
+
+    //get blogs article
+    app.get("/blogs", async (req, res) => {
+      const result = await blogsCollection.find({}).toArray();
+      res.json(result);
+    });
+
+    //get all products
+    app.get("/shop", async (req, res) => {
+      const result = await shopCollection.find({}).toArray();
+      res.json(result);
+    });
+
+    //add new product
+    app.post("/shop", async (req, res) => {
+      const newProducts = req.body;
+      const result = await shopCollection.insertOne(newProducts);
+
+      console.log(`A document was inserted with the _id: ${result.insertedId}`);
+      res.json(result);
+    });
+
+    //get all orders
+    app.get("/orders", async (req, res) => {
+      const result = await orderCollection.find({}).toArray();
+      res.json(result);
+    });
+    //DELETE API USING OBJECT ID
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      // console.log(`DELTE _id: ${id}`);
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
+      res.json(result);
+    });
+
+    //GET BY EMAIL ID
+    app.get('/myorders/:email', async (req, res) => {
+      console.log(req.params.email);
+      const email = req.params.email;
+      const query = { email: email };
+      const cursor = orderCollection.find(query);
+      const result = await cursor.toArray();
+      // console.log(appointments);
+      res.json(result);
+  })
+
+
+    //add new order
+    app.post("/orders", async (req, res) => {
+      const newOrder = req.body;
+      const result = await orderCollection.insertOne(newOrder);
+
+      console.log(`A document was inserted with the _id: ${result.insertedId}`);
+      res.json(result);
+    });
+
+    //get all review
+    app.get("/review", async (req, res) => {
+      const result = await reviewCollection.find({}).toArray();
+      res.json(result);
+    });
+
+    //add new review
+    app.post("/review", async (req, res) => {
+      const newreview = req.body;
+      const result = await reviewCollection.insertOne(newreview);
+
+      console.log(`A document was inserted with the _id: ${result.insertedId}`);
+      res.json(result);
+    });
+
+  } finally {
+    //   await client.close();
+  }
+}
+
+run().catch(console.dir);
+
+app.get("/", (req, res) => {
+  res.send("Hello RAKIB JEWELLERY!");
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});
