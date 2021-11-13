@@ -143,6 +143,30 @@ async function run() {
       res.json({ admin: isAdmin });
   })
 
+      // //UPDATE PUT API for Staus orders
+      app.put("/orders/:id", async (req, res) => {
+        // console.log('update id', req.body._id);
+        const id = req.body._id;
+        const updateStatus = req.body.status;
+        // console.log('hitting with req.body', req.body);
+        const filter = { _id: ObjectId(req.body._id) };
+        console.log('hitting with status', filter);
+        const options = { upsert: true };
+        const updateDoc = {
+          $set: { status : updateStatus }
+        };
+        const result = await orderCollection.updateOne(filter, updateDoc, options);
+        res.send(result);
+      });
+
+          //GET API by ID
+    app.get("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.findOne(query);
+      res.json(result);
+    });
+
 
 
   } finally {
@@ -159,6 +183,7 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
+
 
 
 //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
