@@ -20,9 +20,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    //   console.log(`done`)
     const database = client.db("jewelry_shop");
-
     const shopCollection = database.collection("shop");
     const orderCollection = database.collection("order");
     const blogsCollection = database.collection("blogs");
@@ -46,7 +44,14 @@ async function run() {
       const newProducts = req.body;
       const result = await shopCollection.insertOne(newProducts);
 
-      console.log(`A document was inserted with the _id: ${result.insertedId}`);
+      res.json(result);
+    });
+
+    //DELETE PRODUCTS USING OBJECT ID
+    app.delete("/shop/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await shopCollection.deleteOne(query);
       res.json(result);
     });
 
@@ -58,7 +63,6 @@ async function run() {
     //DELETE API USING OBJECT ID
     app.delete("/orders/:id", async (req, res) => {
       const id = req.params.id;
-      // console.log(`DELTE _id: ${id}`);
       const query = { _id: ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
       res.json(result);
@@ -71,7 +75,6 @@ async function run() {
       const query = { email: email };
       const cursor = orderCollection.find(query);
       const result = await cursor.toArray();
-      // console.log(appointments);
       res.json(result);
     });
 
@@ -80,7 +83,6 @@ async function run() {
       const newOrder = req.body;
       const result = await orderCollection.insertOne(newOrder);
 
-      // console.log(`A document was inserted with the _id: ${result.insertedId}`);
       res.json(result);
     });
 
@@ -95,16 +97,13 @@ async function run() {
       const newreview = req.body;
       const result = await reviewCollection.insertOne(newreview);
 
-      // console.log(`A document was inserted with the _id: ${result.insertedId}`);
       res.json(result);
     });
 
     //USER ADD TO DB using register
     app.post("/users", async (req, res) => {
       const user = req.body;
-      // console.log(user);
       const result = await usersCollection.insertOne(user);
-      // console.log(result);
       res.json(result);
     });
 
@@ -124,7 +123,6 @@ async function run() {
 
     app.put("/users/admin", async (req, res) => {
       const user = req.body;
-      // console.log(user.email);
       const filter = { email: user.email };
       const updateDoc = { $set: { role: "admin" } };
       const result = await usersCollection.updateOne(filter, updateDoc);
@@ -145,12 +143,9 @@ async function run() {
 
       // //UPDATE PUT API for Staus orders
       app.put("/orders/:id", async (req, res) => {
-        // console.log('update id', req.body._id);
         const id = req.body._id;
         const updateStatus = req.body.status;
-        // console.log('hitting with req.body', req.body);
         const filter = { _id: ObjectId(req.body._id) };
-        console.log('hitting with status', filter);
         const options = { upsert: true };
         const updateDoc = {
           $set: { status : updateStatus }
@@ -177,7 +172,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Hello RAKIB JEWELLERY!");
+  res.send("Hello RAKIB JEWELLERY SERVER!");
 });
 
 app.listen(port, () => {
