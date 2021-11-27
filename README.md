@@ -1,5 +1,7 @@
 # Getting Started with RAKIB-Jewellers [ click here to see live demo](https://rakib-jewellers.firebaseapp.com/)
 
+# Client side code link: https://github.com/karakib2k18/Jewellery-shop-client
+
 ### This project was created with  using Meterial UI, React, React-Hook-form, firebase, react-routerdom@5, node, express, mongodb etc.
 
 ## This website details and benifit is bellow:
