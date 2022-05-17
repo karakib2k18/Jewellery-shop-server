@@ -59,7 +59,7 @@ async function run() {
       const filter = { _id: ObjectId(req.body._id) };
       const options = { upsert: true };
       const updateDoc = {
-        $set: { name: updateName, updateDescription: description,updateImage: image , updatePrice: price},
+        $set: { name: updateName, description : updateDescription, image : updateImage , price :updatePrice },
       };
       const result = await shopCollection.updateOne(
         filter,
@@ -76,15 +76,15 @@ async function run() {
           const size = parseInt(req.query.perPageItem);
           console.log(req.query)
     
-          let students;
+          let products;
           const count = await cursor.count();
           if (page) {
-            students = await cursor
+            products = await cursor
               .skip(page * size)
               .limit(size)
               .toArray();
           } else {
-            students = await cursor.toArray();
+            products = await cursor.toArray();
           }
     
           res.send({
@@ -116,15 +116,15 @@ async function run() {
       const size = parseInt(req.query.perPageItem);
       console.log(req.query)
 
-      let students;
+      let orders;
       const count = await cursor.count();
       if (page) {
-        students = await cursor
+        orders = await cursor
           .skip(page * size)
           .limit(size)
           .toArray();
       } else {
-        students = await cursor.toArray();
+        orders = await cursor.toArray();
       }
 
       res.send({
