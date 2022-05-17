@@ -76,20 +76,20 @@ async function run() {
           const size = parseInt(req.query.perPageItem);
           console.log(req.query)
     
-          let products;
+          let productselector;
           const count = await cursor.count();
           if (page) {
-            products = await cursor
+            productselector = await cursor
               .skip(page * size)
               .limit(size)
               .toArray();
           } else {
-            products = await cursor.toArray();
+            productselector = await cursor.toArray();
           }
     
           res.send({
             count,
-            products,
+            productselector,
           });
         });
 
@@ -116,20 +116,20 @@ async function run() {
       const size = parseInt(req.query.perPageItem);
       console.log(req.query)
 
-      let orders;
+      let orderselements;
       const count = await cursor.count();
       if (page) {
-        orders = await cursor
+        orderselements = await cursor
           .skip(page * size)
           .limit(size)
           .toArray();
       } else {
-        orders = await cursor.toArray();
+        orderselements = await cursor.toArray();
       }
 
       res.send({
         count,
-        orders,
+        orderselements,
       });
     });
 
