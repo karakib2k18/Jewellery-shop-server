@@ -38,6 +38,60 @@ async function run() {
       const result = await shopCollection.find({}).toArray();
       res.json(result);
     });
+      //DELETE PRODUCTS USING OBJECT ID
+      app.delete("/shop/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const result = await shopCollection.deleteOne(query);
+        res.json(result);
+      });
+
+    // //UPDATE PUT API for Manage all products
+    app.put("/shop/:id", async (req, res) => {
+      console.log(req.body);
+      const id = req.body._id;
+
+      const updateName = req.body.name;
+      const updateDescription = req.body.description;
+      const updateImage = req.body.image;
+      const updatePrice = req.body.price;
+
+      const filter = { _id: ObjectId(req.body._id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: { name: updateName, updateDescription: description,updateImage: image , updatePrice: price},
+      };
+      const result = await shopCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send(result);
+    });
+
+        // get all shops using pagination
+        app.get("/shop", async (req, res) => {
+          const cursor = shopCollection.find({});
+          const page = req.query.currentPage;
+          const size = parseInt(req.query.perPageItem);
+          console.log(req.query)
+    
+          let students;
+          const count = await cursor.count();
+          if (page) {
+            students = await cursor
+              .skip(page * size)
+              .limit(size)
+              .toArray();
+          } else {
+            students = await cursor.toArray();
+          }
+    
+          res.send({
+            count,
+            products,
+          });
+        });
 
     //add new product
     app.post("/shop", async (req, res) => {
@@ -47,19 +101,38 @@ async function run() {
       res.json(result);
     });
 
-    //DELETE PRODUCTS USING OBJECT ID
-    app.delete("/shop/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await shopCollection.deleteOne(query);
-      res.json(result);
-    });
+
 
     //get all orders
     app.get("/orders", async (req, res) => {
       const result = await orderCollection.find({}).toArray();
       res.json(result);
     });
+
+    // get all orders suing pagination
+    app.get("/orders", async (req, res) => {
+      const cursor = orderCollection.find({});
+      const page = req.query.currentPage;
+      const size = parseInt(req.query.perPageItem);
+      console.log(req.query)
+
+      let students;
+      const count = await cursor.count();
+      if (page) {
+        students = await cursor
+          .skip(page * size)
+          .limit(size)
+          .toArray();
+      } else {
+        students = await cursor.toArray();
+      }
+
+      res.send({
+        count,
+        orders,
+      });
+    });
+
     //DELETE API USING OBJECT ID
     app.delete("/orders/:id", async (req, res) => {
       const id = req.params.id;
