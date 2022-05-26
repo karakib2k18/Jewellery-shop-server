@@ -12,3 +12,4 @@
 #### It can save people time and money because they can easily select their jewellery according to their budget.
 #### People can buy jewellery place easily from anywhare and anytime. 
 #### So I think this is the best website for People.
+
